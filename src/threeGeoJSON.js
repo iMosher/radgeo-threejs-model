@@ -16,7 +16,7 @@ export function drawThreeGeo({ json, radius, materalOptions }) {
     for (let i = 0; i < container.children.length; i++) {
       container.children[i].userData.update?.(t);
     }
-  }
+  };
 
   container.rotation.x = -Math.PI * 0.5; // KLUDGY HACK to fix orientation
   const x_values = [];
@@ -28,75 +28,119 @@ export function drawThreeGeo({ json, radius, materalOptions }) {
   //interpolated coordinates. Otherwise, lines go through the sphere instead of wrapping around.
   let coordinate_array = [];
   for (let geom_num = 0; geom_num < json_geom.length; geom_num++) {
-    if (json_geom[geom_num].type == 'Point') {
+    if (json_geom[geom_num].type == "Point") {
       convertToSphereCoords(json_geom[geom_num].coordinates, radius);
       drawParticle(x_values[0], y_values[0], z_values[0], materalOptions);
-
-    } else if (json_geom[geom_num].type == 'MultiPoint') {
-      for (let point_num = 0; point_num < json_geom[geom_num].coordinates.length; point_num++) {
-        convertToSphereCoords(json_geom[geom_num].coordinates[point_num], radius);
+    } else if (json_geom[geom_num].type == "MultiPoint") {
+      for (
+        let point_num = 0;
+        point_num < json_geom[geom_num].coordinates.length;
+        point_num++
+      ) {
+        convertToSphereCoords(
+          json_geom[geom_num].coordinates[point_num],
+          radius
+        );
         drawParticle(x_values[0], y_values[0], z_values[0], materalOptions);
       }
-
-    } else if (json_geom[geom_num].type == 'LineString') {
+    } else if (json_geom[geom_num].type == "LineString") {
       coordinate_array = createCoordinateArray(json_geom[geom_num].coordinates);
 
-      for (let point_num = 0; point_num < coordinate_array.length; point_num++) {
+      for (
+        let point_num = 0;
+        point_num < coordinate_array.length;
+        point_num++
+      ) {
         convertToSphereCoords(coordinate_array[point_num], radius);
       }
       drawLine(x_values, y_values, z_values, materalOptions);
+    } else if (json_geom[geom_num].type == "Polygon") {
+      for (
+        let segment_num = 0;
+        segment_num < json_geom[geom_num].coordinates.length;
+        segment_num++
+      ) {
+        coordinate_array = createCoordinateArray(
+          json_geom[geom_num].coordinates[segment_num]
+        );
 
-    } else if (json_geom[geom_num].type == 'Polygon') {
-      for (let segment_num = 0; segment_num < json_geom[geom_num].coordinates.length; segment_num++) {
-        coordinate_array = createCoordinateArray(json_geom[geom_num].coordinates[segment_num]);
-
-        for (let point_num = 0; point_num < coordinate_array.length; point_num++) {
+        for (
+          let point_num = 0;
+          point_num < coordinate_array.length;
+          point_num++
+        ) {
           convertToSphereCoords(coordinate_array[point_num], radius);
         }
         drawLine(x_values, y_values, z_values, materalOptions);
       }
+    } else if (json_geom[geom_num].type == "MultiLineString") {
+      for (
+        let segment_num = 0;
+        segment_num < json_geom[geom_num].coordinates.length;
+        segment_num++
+      ) {
+        coordinate_array = createCoordinateArray(
+          json_geom[geom_num].coordinates[segment_num]
+        );
 
-    } else if (json_geom[geom_num].type == 'MultiLineString') {
-      for (let segment_num = 0; segment_num < json_geom[geom_num].coordinates.length; segment_num++) {
-        coordinate_array = createCoordinateArray(json_geom[geom_num].coordinates[segment_num]);
-
-        for (let point_num = 0; point_num < coordinate_array.length; point_num++) {
+        for (
+          let point_num = 0;
+          point_num < coordinate_array.length;
+          point_num++
+        ) {
           convertToSphereCoords(coordinate_array[point_num], radius);
         }
         drawLine(x_values, y_values, z_values, materalOptions);
       }
+    } else if (json_geom[geom_num].type == "MultiPolygon") {
+      for (
+        let polygon_num = 0;
+        polygon_num < json_geom[geom_num].coordinates.length;
+        polygon_num++
+      ) {
+        for (
+          let segment_num = 0;
+          segment_num < json_geom[geom_num].coordinates[polygon_num].length;
+          segment_num++
+        ) {
+          coordinate_array = createCoordinateArray(
+            json_geom[geom_num].coordinates[polygon_num][segment_num]
+          );
 
-    } else if (json_geom[geom_num].type == 'MultiPolygon') {
-      for (let polygon_num = 0; polygon_num < json_geom[geom_num].coordinates.length; polygon_num++) {
-        for (let segment_num = 0; segment_num < json_geom[geom_num].coordinates[polygon_num].length; segment_num++) {
-          coordinate_array = createCoordinateArray(json_geom[geom_num].coordinates[polygon_num][segment_num]);
-
-          for (let point_num = 0; point_num < coordinate_array.length; point_num++) {
+          for (
+            let point_num = 0;
+            point_num < coordinate_array.length;
+            point_num++
+          ) {
             convertToSphereCoords(coordinate_array[point_num], radius);
           }
           drawLine(x_values, y_values, z_values, materalOptions);
         }
       }
     } else {
-      throw new Error('The geoJSON is not valid.');
+      throw new Error("The geoJSON is not valid.");
     }
   }
 
   function createGeometryArray(json) {
     let geometry_array = [];
 
-    if (json.type == 'Feature') {
+    if (json.type == "Feature") {
       geometry_array.push(json.geometry);
-    } else if (json.type == 'FeatureCollection') {
-      for (let feature_num = 0; feature_num < json.features.length; feature_num++) {
+    } else if (json.type == "FeatureCollection") {
+      for (
+        let feature_num = 0;
+        feature_num < json.features.length;
+        feature_num++
+      ) {
         geometry_array.push(json.features[feature_num].geometry);
       }
-    } else if (json.type == 'GeometryCollection') {
+    } else if (json.type == "GeometryCollection") {
       for (let geom_num = 0; geom_num < json.geometries.length; geom_num++) {
         geometry_array.push(json.geometries[geom_num]);
       }
     } else {
-      throw new Error('The geoJSON is not valid.');
+      throw new Error("The geoJSON is not valid.");
     }
     return geometry_array;
   }
@@ -115,7 +159,11 @@ export function drawThreeGeo({ json, radius, materalOptions }) {
           interpolation_array = [point2, point1];
           interpolation_array = interpolatePoints(interpolation_array);
 
-          for (let inter_point_num = 0; inter_point_num < interpolation_array.length; inter_point_num++) {
+          for (
+            let inter_point_num = 0;
+            inter_point_num < interpolation_array.length;
+            inter_point_num++
+          ) {
             temp_array.push(interpolation_array[inter_point_num]);
           }
         } else {
@@ -151,7 +199,11 @@ export function drawThreeGeo({ json, radius, materalOptions }) {
     let temp_array = [];
     let point1, point2;
 
-    for (let point_num = 0; point_num < interpolation_array.length - 1; point_num++) {
+    for (
+      let point_num = 0;
+      point_num < interpolation_array.length - 1;
+      point_num++
+    ) {
       point1 = interpolation_array[point_num];
       point2 = interpolation_array[point_num + 1];
 
@@ -185,9 +237,17 @@ export function drawThreeGeo({ json, radius, materalOptions }) {
     const lon = coordinates_array[0];
     const lat = coordinates_array[1];
 
-    x_values.push(Math.cos(lat * Math.PI / 180) * Math.cos(lon * Math.PI / 180) * sphere_radius);
-    y_values.push(Math.cos(lat * Math.PI / 180) * Math.sin(lon * Math.PI / 180) * sphere_radius);
-    z_values.push(Math.sin(lat * Math.PI / 180) * sphere_radius);
+    x_values.push(
+      Math.cos((lat * Math.PI) / 180) *
+        Math.cos((lon * Math.PI) / 180) *
+        sphere_radius
+    );
+    y_values.push(
+      Math.cos((lat * Math.PI) / 180) *
+        Math.sin((lon * Math.PI) / 180) *
+        sphere_radius
+    );
+    z_values.push(Math.sin((lat * Math.PI) / 180) * sphere_radius);
   }
 
   function drawParticle(x, y, z, options) {
@@ -216,11 +276,11 @@ export function drawThreeGeo({ json, radius, materalOptions }) {
     if (Math.random() > 0.5) {
       hue -= 0.3;
     }
-    const color = new THREE.Color().setHSL(hue, 1.0, 0.5);
+    const randColor = new THREE.Color().setHSL(hue, 1.0, 0.5); //color randomization
     const lineMaterial = new LineMaterial({
-      color,
+      color: "#ffcc00",
       linewidth: 2,
-      fog: true
+      fog: true,
     });
 
     const line = new Line2(lineGeo, lineMaterial);
@@ -228,7 +288,7 @@ export function drawThreeGeo({ json, radius, materalOptions }) {
     const rate = Math.random() * 0.0002;
     line.userData.update = (t) => {
       lineMaterial.dashOffset = t * rate;
-    }
+    };
     container.add(line);
 
     clearArrays();

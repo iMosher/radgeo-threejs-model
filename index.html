@@ -7,6 +7,20 @@
     <style>
       body {
         margin: 0;
+        font-family: Arial, sans-serif;
+      }
+      #title {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #ffcc00;
+        font-size: 4rem;
+        font-weight: bold;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        z-index: 100;
+        pointer-events: none;
+        letter-spacing: 0.1em;
       }
     </style>
     <script type="importmap">
@@ -19,6 +33,7 @@
     </script>
   </head>
   <body>
+    <div id="title">RadGEO</div>
     <script type="module" src="index.js"></script>
   </body>
 </html>

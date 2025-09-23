@@ -15,6 +15,8 @@ const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 100);
 camera.position.z = 5;
 const scene = new THREE.Scene();
 
+scene.fog = new THREE.FogExp2(0x000000, 0.15);
+
 //add controls
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -33,10 +35,10 @@ scene.add(line);
 
 //add starfield
 const starfield = getStarfield({ numStars: 1000 });
-scene.add(starfield);
+line.add(starfield);
 
 //add countries
-fetch("./geojson/ne_110m_land.json")
+fetch("./geojson/countries_states.geojson")
   .then((response) => response.text())
   .then((text) => {
     const data = JSON.parse(text);
@@ -47,14 +49,14 @@ fetch("./geojson/ne_110m_land.json")
         color: 0x80ff80,
       },
     });
-    scene.add(countries);
+    line.add(countries);
   });
 
 //render loop
 function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
-  //globe.rotation.y += 0.001;
+  //line.rotation.y += 0.001;
   controls.update();
 }
 animate();
