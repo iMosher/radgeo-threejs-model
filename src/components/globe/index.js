@@ -1,26 +1,21 @@
 //author: @iMosher (TetonTopo)
 //description: globe model with wireframe
 import * as THREE from "three";
-import { OrbitControls } from "jsm/controls/OrbitControls.js";
-import getStarfield from "./getStarfield.js";
-import { drawThreeGeo } from "./threeGeoJSON.js";
+import getStarfield from "../../utils/getStarfield.js";
+import { drawThreeGeo } from "../../utils/threeGeoJSON.js";
 
 //scene setup
 const w = window.innerWidth;
 const h = window.innerHeight;
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const canvas = document.getElementById("three-canvas");
+const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
 renderer.setSize(w, h);
-document.body.appendChild(renderer.domElement);
 const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 100);
 camera.position.z = 5;
 const scene = new THREE.Scene();
-
 scene.fog = new THREE.FogExp2(0x000000, 0.15);
 
-//add controls
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.03;
+let scrollPosY = 0;
 
 //line mesh creation for globe
 const geometry = new THREE.SphereGeometry(2);
@@ -35,10 +30,10 @@ scene.add(line);
 
 //add starfield
 const starfield = getStarfield({ numStars: 1000 });
-line.add(starfield);
+scene.add(starfield);
 
 //add countries
-fetch("./geojson/countries_states.geojson")
+fetch("../../public/assets/geojson/countries_states.geojson")
   .then((response) => response.text())
   .then((text) => {
     const data = JSON.parse(text);
@@ -55,12 +50,15 @@ fetch("./geojson/countries_states.geojson")
 //render loop
 function animate() {
   requestAnimationFrame(animate);
+  line.rotation.y = 2 * Math.PI * scrollPosY;
   renderer.render(scene, camera);
-  //line.rotation.y += 0.001;
-  controls.update();
 }
 animate();
 
+//scroll event listener
+window.addEventListener("scroll", () => {
+  scrollPosY = window.scrollY / document.body.clientHeight;
+});
 //window resize handler
 function handleWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
