@@ -2,8 +2,8 @@
 //description: globe model with wireframe
 import * as THREE from "three";
 import { OrbitControls } from "jsm/controls/OrbitControls.js";
-import getStarfield from "./src/getStarfield.js";
-import { drawThreeGeo } from "./src/threeGeoJSON.js";
+import getStarfield from "./getStarfield.js";
+import { drawThreeGeo } from "./threeGeoJSON.js";
 
 //scene setup
 const w = window.innerWidth;
