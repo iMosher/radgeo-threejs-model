@@ -1,6 +1,7 @@
 //author: @iMosher (TetonTopo)
 //description: globe model with wireframe
 import * as THREE from "three";
+import getLayer from "../../utils/getLayer.js";
 import getStarfield from "../../utils/getStarfield.js";
 import { drawThreeGeo } from "../../utils/threeGeoJSON.js";
 
@@ -19,19 +20,14 @@ let scrollPosY = 0;
 
 //line mesh creation for globe
 const geometry = new THREE.SphereGeometry(2);
+geometry.center();
 const lineMat = new THREE.LineBasicMaterial({
   color: 0xffffff,
   transparent: true,
   opacity: 0.4,
 });
 const edges = new THREE.EdgesGeometry(geometry, 1);
-const line = new THREE.LineSegments(edges, lineMat);
-scene.add(line);
-
-//add starfield
-const starfield = getStarfield({ numStars: 1000 });
-scene.add(starfield);
-
+const globe = new THREE.LineSegments(edges, lineMat);
 //add countries
 fetch("../../public/assets/geojson/countries_states.geojson")
   .then((response) => response.text())
@@ -44,13 +40,35 @@ fetch("../../public/assets/geojson/countries_states.geojson")
         color: 0x80ff80,
       },
     });
-    line.add(countries);
+    globe.add(countries);
   });
+globe.position.set(1.2, -1, 0);
+scene.add(globe);
+
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444);
+scene.add(hemiLight);
+
+const gradientBackground = getLayer({
+  hasFog: false,
+  hue: 0.6,
+  numSprites: 8,
+  opacity: 0.2,
+  radius: 10,
+  size: 30,
+  z: -10.5,
+});
+scene.add(gradientBackground);
+
+//add starfield
+const starfield = getStarfield({ numStars: 4500 });
+scene.add(starfield);
 
 //render loop
 function animate() {
   requestAnimationFrame(animate);
-  line.rotation.y = 2 * Math.PI * scrollPosY;
+  const goalPos = Math.PI * scrollPosY;
+  globe.rotation.y -= (globe.rotation.y - goalPos * 1.0) * 0.1;
+  starfield.position.z = -20 * scrollPosY;
   renderer.render(scene, camera);
 }
 animate();

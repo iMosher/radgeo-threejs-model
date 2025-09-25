@@ -21,10 +21,10 @@ function getSprite({ hasFog, color, opacity, path, pos, size }) {
 
 function getLayer({
   hasFog = true,
-  hue = 0.56,
-  numSprites = 8,
+  hue = 0.6,
+  numSprites = 4,
   opacity = 0.2,
-  path = "./assets/rad-grad.png",
+  path = "../../assets/rad-grad.png",
   radius = 10,
   sat = 0.5,
   size = 24,
